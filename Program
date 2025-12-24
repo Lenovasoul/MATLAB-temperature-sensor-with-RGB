@@ -1,0 +1,72 @@
+clear; clc;
+
+a = arduino('COM3', 'Uno', 'Libraries', 'Adafruit/DHTxx'); % Auto-detect port and board
+sensor = addon(a, 'Adafruit/DHTxx', 'A0','DHT11')
+% Define pins
+tempPin = 'A0';           %Analog pin for thermistor
+redPin = 'D9';            %PWM pin for Red USE RESISTOR
+greenPin = 'D10';         %PWM pin for Green USE RESISTOR
+bluePin = 'D11';          %PWM pin for Blue USE RESISTOR
+
+%Thermistor constants
+R1 = 10000; %Fixed resistor value in ohms (voltage divider)
+c1 = 0.001129148;
+c2 = 0.000234125;
+c3 = 0.0000000876741;
+
+%Initializes the plot
+figure;
+h = animatedline('Marker', '*', 'LineStyle', 'none', 'Color', 'w');
+xlabel('Time (s)');
+ylabel('Temperature (°C)');
+title('Outdoor Temperature Over Time');
+grid on;
+
+%Timing
+startTime = datetime('now');
+duration = minutes(5); %Runs for 5 minutes
+timeVec = [];
+tempVec = [];
+
+
+while datetime('now') - startTime < duration
+
+    tempC = readTemperature(sensor);
+    
+    %Updates plot
+    t = seconds(datetime('now') - startTime);
+    addpoints(h, t, tempC);
+    drawnow;
+    
+    %Stores data
+    timeVec(end+1) = t;
+    tempVec(end+1) = tempC;
+    
+    % Map temperature to RGB
+    if tempC < 29
+        % Cold: Blue
+        writePWMVoltage(a, redPin, 0);
+        writePWMVoltage(a, greenPin, 0);
+        writePWMVoltage(a, bluePin, 1);
+    elseif tempC >= 29 && tempC < 31
+        % Moderate: Green
+        writePWMVoltage(a, redPin, 0);
+        writePWMVoltage(a, greenPin, 1);
+        writePWMVoltage(a, bluePin, 0);
+    else
+        % Hot: Red
+        writePWMVoltage(a, redPin, 1);
+        writePWMVoltage(a, greenPin, 0);
+        writePWMVoltage(a, bluePin, 0);
+    end
+    sprint('current tempature: %0.1f', tempC)
+    pause(1); %Samples every second
+end
+
+%Final plot
+figure;
+plot(timeVec, tempVec);
+xlabel('Time (s)');
+ylabel('Temperature (°C)');
+title('Final Temperature Plot');
+grid on;
