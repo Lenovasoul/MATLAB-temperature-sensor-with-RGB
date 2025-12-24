@@ -8,5 +8,10 @@ DHT Add-On Library for Arduino,
 Simulink,
 & Simulink Support Package for Arduino Hardware.
 
+Required Harware:
+Arduino UNO R3, RGB LED, 1k or 330 ohm resistor, a bread-board, DHT11 Tempature and Humidity Module, 5 Breadboard Jumper Wires, 3 Female to Male Dupont Wires, and 1 USB cable. 
+
+
+
 The Setup I used for the Project:
 <img width="1104" height="553" alt="image" src="https://github.com/user-attachments/assets/a5f7e1ec-6da1-4f66-b580-5cabbcd378b3" />
